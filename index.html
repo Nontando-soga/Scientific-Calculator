@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <title>Scientific Calculator</title>
+        <link rel = "stylesheet" href = "style.css">
+    </head>
+    <body>
+        <div class = "calculator">
+            <div class = "calculation">
+                <div class = "display">
+                    <input type = "text" id = "input" placeholder="0" disabled/>   <!---"disabled" so that user don't directly type into it, it only displays input when buttons are pressed-->
+                </div>
+            <div class = "buttons">
+                <!--Row 1-->
+                <button data-number = "(" class = "side-button 
+                button">(</button>
+                <button data-number = ")" class = "side-button button
+                ">)</button>
+                <button data-number = "AC" id = "clear" 
+                class = "operator-button button">AC</button>
+                <button data-number = "DEL" id = "erase" 
+                class = "operator-button button">DEL</button>
+                <button data-number = "/" class = "operator-button 
+                button">/</button>
+                <button data-number = "*" class = "operator-button 
+                button">*</button>
+                
+                <!--Row 2-->
+                <button data-number = "^2" class = "side-button 
+                button">^2</button>
+                <button data-number = "^3" class = "side-button 
+                button">^3</button>
+                <button data-number = "7" class = "digit-button 
+                button">7</button>
+                <button data-number = "8" class = "digit-button 
+                button">8</button>
+                <button data-number = "9" class = "digit-button 
+                button">9</button>
+                <button data-number = "-" class = "operator-button 
+                button">-</button>
+                
+                <!---Row 3--->
+                <button data-number = "√" class = "side-button 
+                button">√</button>
+                <button data-number = "∛" class = "side-button  
+                button">∛</button>
+                <button data-number = "6" class = "digit-button 
+                button">6</button>
+                <button data-number = "5" class = "digit-button 
+                button">5</button>
+                <button data-number = "4" class = "digit-button 
+                button">4</button>
+                <button data-number = "+" class = "operator-button 
+                button">+</button>
+                
+                
+                <!---Row 4--->
+                <button data-number = "!" class = "side-button 
+                button">!</button>
+                <button data-number = "sin(" class = "side-button 
+                button">sin(</button>
+                <button data-number = "1" class = "digit-button 
+                button">1</button>
+                <button data-number = "2" class = "digit-button 
+                button">2</button>
+                <button data-number = "3" class = "digit-button 
+                button">3</button>
+                <button data-number = "=" id = "equal" 
+                class = "operator-button">=</button>
+                
+                <!---Row 5 --->
+                <button data-number = "cos(" class = "side-button 
+                button">cos(</button>
+                <button data-number = "tan(" class = "side-button 
+                button">tan(</button>
+                <button data-number = "0" id = "zero" 
+                class = "digit-button button">0</button>
+                <button data-number = "." class = "digit-button 
+                button">.</button>
+                
+                </div>
+            </div>
+            <div class = "history">
+                <h2 id = "historyTitle">History</h2>
+                <div id = "historyContent"></div>           
+            </div>       
+        </div>
+        
+        <script>
+            let equalPressed = 0;
+            let buttonInput = document.querySelectorAll(".button");
+            let input = document.getElementById("input");
+            let equal = document.getElementById("equal");
+            let clear = document.getElementById("clear");
+            let erase = document.getElementById("erase");
+            let historyContent = document.getElementById
+            ("historyContent");
+            
+            window.onload = () => {                                  /** Event handler for window onload***/
+                input.value = "";
+            };
+            
+            buttonInput.forEach((buttonClass) => {
+                buttonClass.addEventListener("click", (event) => {
+                if (equalPressed === 1) {                             /**equalPressed is the function that is triggered when equal sign is pressed**/
+                    equalPressed = 0;
+                }
+                let value = event.target.dataset.number;
+                
+                if (value === "AC") {
+                    input.value = "";
+                    return;
+                }
+                    
+                if (value === "DEL") {
+                    input.value = input.value.slice(0,-1);
+                    return;
+                }
+                    
+                input.value += value;                                
+                });
+            });
+            
+            equal.addEventListener("click" , () => {
+                equalPressed = 1;
+                let inputValue = input.value;
+                
+                try {                                    /**used to define a block of code to test for errors while being executed, without crashing the program**/
+                    let expression = inputValue
+                    .replaceAll("sin", "Math.sin")
+                    .replaceAll("cos", "Math.cos")
+                    .replaceAll("tan", "Math.tan")
+                    .replaceAll("^2", "**2")
+                    .replaceAll("^3", "**3")
+                    .replace(/√(\d+(\.\d+)?)/g, "Math.sqrt($1)")
+                    .replace(/∛(\d+(\.\d+)?)/g, "Math.cbrt($1)")
+                    .replace(/(\d+)!/g, (_, num) => factorial 
+                    (Number(num)));
+                    
+                
+                let result = eval(expression);
+                if (Number.isNaN(result) || !Number.isFinite
+                (result)) {
+                    throw new Error("Invalid expression");
+                }
+                
+                input.value = Number.isInteger(result) ? result :
+                result.toFixed(2);                                /** toFixed is used to control how many digits appear after decimal point. in this case it's 2 decimal points **/
+                addToHistory(expression, input.value); 
+                    
+                }
+                
+                catch (error) {
+                alert("Error: " + error.message);
+            }
+                
+            });
+            
+            function factorial(n) {
+                if (n === 0 || n === 1) return 1;
+                return n * factorial(n-1);
+            }
+            
+            function addToHistory(expression, result) {
+                let divItem = document.createElement ("div");
+                let span = document.createElement("span");
+                let button = document.createElement("button");
+                
+                divItem.className = "historyItem";
+                divItem.style.display = "flex";
+                divItem.style.justifyContent = "space-between";
+                
+                span.textContent = `${expression} = ${result}`;
+                span.dataset.userInput = expression;
+                span.style.cursor = "pointer";
+                span.style.color = "white";
+                
+                button.textContent = "Delete";
+                button.className = "btn-sm";
+                button.style.backgroundColor = "black";
+                button.style.color = "white";
+                
+                button.addEventListener("click", () => divItem.remove 
+                ());
+                span.addEventListener("click" , () => {
+                    input.value = span.dataset.userInput;
+   
+                });
+                
+                divItem.appendChild(span);             /**method used to add a node to the end of a parent node's list of children in the DOM**/
+                divItem.appendChild(button);
+                historyContent.appendChild(divItem);
+            }
+            
+            clear.addEventListener("click" , () => {
+                input.value = "";
+            });
+            erase.addEventListener("click", () => {
+                input.value = input.value.slice(0, -1);
+            });
+            
+                
+           
+                
+            
+            
+            
+           
+            
+            
+            
+            
+        
+        </script>
+    
+    
+    
+    </body>
+</html>
