@@ -1,0 +1,1 @@
+This is my second code attempt at developing a calculator App. I have mostly used the help of ChatGPT and YouTube to write this code. I am open to feedback and suggestion to improve and learn effectively.
